@@ -1,0 +1,13 @@
+.embed {
+  background: url('../images/embed.gif') no-repeat;
+/*  background: url('../images/embed.png') no-repeat;*/
+  float: right;
+  height: 16px;
+  opacity: 0.6;
+  text-indent: -9999px;
+  width: 16px;
+}
+
+.embed:hover {
+  opacity: 1;
+}
