@@ -34,6 +34,8 @@
                 'left': '5px',
                 'top': '7px'
             });
+            // Add triangle separator
+            $notice.find('.author .fn').after('<span style="border: 3px solid transparent; border-left-color: #000; display: inline-block; height: 0; margin: 0 3px 2px 5px; width: 0; line-height: 8px;"></span>');
 
         // TODO: Might be simpler just to dump $notice.html() in the container...
         var content = template.replace('${url}', $notice.find('.timestamp').attr('href'))
