@@ -8,6 +8,7 @@
                                 modal: true, 
                                 width: 530,
                                 height: 230,
+                                title: 'Embed this notice',
                                 close: function() {
                                     $textarea.val('');
                                 } 
