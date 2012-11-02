@@ -16,7 +16,7 @@
         $textarea = $dialog.children('textarea'),
         template  = '<blockquote style="position: relative;" cite="${url}">${title} ${thumbs} ${content}</blockquote>';
 
-    $('#notices_primary').delegate('.embed', 'click', function (e) {
+    $('#content_inner').delegate('.embed', 'click', function (e) {
         e.preventDefault();
         e.stopPropagation();
 
