@@ -49,6 +49,22 @@ class EmbedAction extends Action
     {
         parent::prepare($args);
         $this->notice = Notice::staticGet('id', $this->trimmed('id'));
+
+        // From: /actions/shownotice.php
+        if (empty($this->notice)) {
+            // Did we used to have it, and it got deleted?
+            $deleted = Deleted_notice::staticGet($this->trimmed('id'));
+            if (!empty($deleted)) {
+                // TRANS: Client error displayed trying to show a deleted notice.
+                $this->clientError(_('Notice deleted.'), 410);
+            } else {
+                // TRANS: Client error displayed trying to show a non-existing notice.
+                $this->clientError(_('No such notice.'), 404);
+            }
+
+            return false;
+        }
+
         return true;
     }
 
@@ -98,113 +114,110 @@ class EmbedAction extends Action
         // TODO: TRANS
         // TODO: Some of these xpath queries can probably be combined
         // TODO: Better CSS support for different notice types (bookmarks, etc)
-        if($this->notice) {
-            // Get HTML
-            $out = new htmlstr();
-            $nli = new SingleNoticeItem($this->notice, $out);
-            $nli->show();
-            $notice_str = $out->xw->outputMemory();
 
-            // Build DOM
-            $dom = new DOMDocument();
-            $notice_str = mb_convert_encoding($notice_str, 'HTML-ENTITIES', 'UTF-8');
-            $dom->loadHTML($notice_str);
-            $xpath = new DomXPath($dom);
+        // Get HTML
+        $out = new htmlstr();
+        $nli = new SingleNoticeItem($this->notice, $out);
+        $nli->show();
+        $notice_str = $out->xw->outputMemory();
 
-            // Remove 'embed' link
-            $elm = $xpath->query('//a[contains(@class, "embed")]');
-            if($elm->length !== 0) {
-                $elm = $elm->item(0);
-                $elm->parentNode->removeChild($elm);
-            }
+        // Build DOM
+        $dom = new DOMDocument();
+        $notice_str = mb_convert_encoding($notice_str, 'HTML-ENTITIES', 'UTF-8');
+        $dom->loadHTML($notice_str);
+        $xpath = new DomXPath($dom);
 
-            // Remove 'reply', 'favor', etc
-            $elm = $xpath->query('//div[contains(@class, "notice-options")]');
-            if($elm->length !== 0) {
-                $elm = $elm->item(0);
-                $elm->parentNode->removeChild($elm);
-            }
-
-            // Add parentheses around "in context"
-            $elm = $xpath->query('//a[contains(@class, "response")]');
-            if($elm->length !== 0) {
-                $elm = $elm->item(0);
-                $elm->nodeValue = '(' . $elm->nodeValue . ')';
-            }
-
-            // Remove location
-            $elm = $xpath->query('//span[contains(@class, "location")]');
-            if($elm->length !== 0) {
-                $elm->item(0)->parentNode->removeChild($elm->item(0));
-            }
-
-            // Make timestamp absolute
-            $elm = $xpath->query('//abbr[contains(@class, "published")]');
-            if($elm->length !== 0) {
-                $elm = $elm->item(0);
-                $date_str = explode('T', $elm->getAttribute('title'));
-                $elm->nodeValue = 'on ' . $date_str[0];
-            }
-
-            // Add triangle
-            $elm = $xpath->query('//span[contains(@class, "author")]/a');
-            if($elm->length !== 0) {
-                $triangle = $dom->createElement('span');
-                $triangle->setAttribute('style', 'border: 3px solid transparent; border-left-color: #000; display: inline-block; height: 0; margin: 0 3px 2px 5px; width: 0; line-height: 8px;');
-                $elm->item(0)->appendChild($triangle);
-            }
-
-            // Remove all classes (reduce chances of clashing with foreign CSS)
-            $elm = $xpath->query('//*[@class]');
-            foreach($elm as $el) {
-                $el->removeAttribute('class');
-            }
-
-            // Avatar styles
-            $elm = $xpath->query('//img[contains(@class, "avatar")]');
-            if($elm->length !== 0) {
-                $elm->item(0)->setAttribute('style', 'position: absolute; left: 5px; top: 7px;');
-            }
-
-            // entry-title styles
-            $elm = $xpath->query('//div[contains(@class, "entry-title")]');
-            if($elm->length !== 0) {
-                $elm->item(0)->setAttribute('style', 'margin: 2px 7px 0 59px;');
-            }
-
-            // entry-content styles
-            $elm = $xpath->query('//div[contains(@class, "entry-content")]');
-            if($elm->length !== 0) {
-                $elm->item(0)->setAttribute('style', 'margin: 2px 7px 0 59px;');
-            }
-
-            // Nodes to string
-            $embed_str = '<blockquote style="position: relative;">';
-            $elm = $xpath->query('//body/li');
-            $elm = $elm->item(0)->childNodes;
-            foreach($elm as $el) {
-                $embed_str .= $dom->saveHTML($el);
-            }
-            $embed_str .= '</blockquote>';
-            $embed_str = htmlspecialchars($embed_str, ENT_NOQUOTES);
-
-            // Remove lines containing only whitespace
-            $embed_str = preg_replace("/(^[\r\n]*|[\r\n]+)[\s\t]*[\r\n]+/", "", $embed_str);
-
-            // Spit out code
-            $this->element('h2', null, 'HTML Code');
-            $this->elementStart('textarea', array('style' => 'margin-bottom: 12px; width: 99%; height: 300px;', 'id' => 'ch-ta'));
-            $this->raw($embed_str);
-            $this->elementEnd('textarea');
-
-            // Render the notice for reference
-            $this->element('h2', null, 'Corresponding Notice');
-            $this->elementStart('ol', array('class' => 'notices xoxo'));
-            $this->raw($notice_str);
-            $this->elementEnd('ol');
-        } else { // TODO: Proper message
-            $this->element('p', null, 'Identify yourself, fool!');
+        // Remove 'embed' link
+        $elm = $xpath->query('//a[contains(@class, "embed")]');
+        if($elm->length !== 0) {
+            $elm = $elm->item(0);
+            $elm->parentNode->removeChild($elm);
         }
+
+        // Remove 'reply', 'favor', etc
+        $elm = $xpath->query('//div[contains(@class, "notice-options")]');
+        if($elm->length !== 0) {
+            $elm = $elm->item(0);
+            $elm->parentNode->removeChild($elm);
+        }
+
+        // Add parentheses around "in context"
+        $elm = $xpath->query('//a[contains(@class, "response")]');
+        if($elm->length !== 0) {
+            $elm = $elm->item(0);
+            $elm->nodeValue = '(' . $elm->nodeValue . ')';
+        }
+
+        // Remove location
+        $elm = $xpath->query('//span[contains(@class, "location")]');
+        if($elm->length !== 0) {
+            $elm->item(0)->parentNode->removeChild($elm->item(0));
+        }
+
+        // Make timestamp absolute
+        $elm = $xpath->query('//abbr[contains(@class, "published")]');
+        if($elm->length !== 0) {
+            $elm = $elm->item(0);
+            $date_str = explode('T', $elm->getAttribute('title'));
+            $elm->nodeValue = 'on ' . $date_str[0];
+        }
+
+        // Add triangle
+        $elm = $xpath->query('//span[contains(@class, "author")]/a');
+        if($elm->length !== 0) {
+            $triangle = $dom->createElement('span');
+            $triangle->setAttribute('style', 'border: 3px solid transparent; border-left-color: #000; display: inline-block; height: 0; margin: 0 3px 2px 5px; width: 0; line-height: 8px;');
+            $elm->item(0)->appendChild($triangle);
+        }
+
+        // Remove all classes (reduce chances of clashing with foreign CSS)
+        $elm = $xpath->query('//*[@class]');
+        foreach($elm as $el) {
+            $el->removeAttribute('class');
+        }
+
+        // Avatar styles
+        $elm = $xpath->query('//img[contains(@class, "avatar")]');
+        if($elm->length !== 0) {
+            $elm->item(0)->setAttribute('style', 'position: absolute; left: 5px; top: 7px;');
+        }
+
+        // entry-title styles
+        $elm = $xpath->query('//div[contains(@class, "entry-title")]');
+        if($elm->length !== 0) {
+            $elm->item(0)->setAttribute('style', 'margin: 2px 7px 0 59px;');
+        }
+
+        // entry-content styles
+        $elm = $xpath->query('//div[contains(@class, "entry-content")]');
+        if($elm->length !== 0) {
+            $elm->item(0)->setAttribute('style', 'margin: 2px 7px 0 59px;');
+        }
+
+        // Nodes to string
+        $embed_str = '<blockquote style="position: relative;">';
+        $elm = $xpath->query('//body/li');
+        $elm = $elm->item(0)->childNodes;
+        foreach($elm as $el) {
+            $embed_str .= $dom->saveHTML($el);
+        }
+        $embed_str .= '</blockquote>';
+        $embed_str = htmlspecialchars($embed_str, ENT_NOQUOTES);
+
+        // Remove lines containing only whitespace
+        $embed_str = preg_replace("/(^[\r\n]*|[\r\n]+)[\s\t]*[\r\n]+/", "", $embed_str);
+
+        // Spit out code
+        $this->element('h2', null, 'HTML Code');
+        $this->elementStart('textarea', array('style' => 'margin-bottom: 12px; width: 99%; height: 300px;', 'id' => 'ch-ta'));
+        $this->raw($embed_str);
+        $this->elementEnd('textarea');
+
+        // Render the notice for reference
+        $this->element('h2', null, 'Corresponding Notice');
+        $this->elementStart('ol', array('class' => 'notices xoxo'));
+        $this->raw($notice_str);
+        $this->elementEnd('ol');
     }
 
     /**
