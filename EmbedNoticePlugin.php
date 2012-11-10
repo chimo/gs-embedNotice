@@ -39,15 +39,60 @@ class EmbedNoticePlugin extends Plugin
     }
 
     function onStartShowNoticeItem($item)
-//    function onEndShowNoticeOptionItems($item)
     {
-        $notice = $item->notice;
-        $out = $item->out;
-
-        // TODO: point to a real page for when JS is disabled
-        $out->element('a', array('href' => '#', 'class' => 'embed', 'title' => 'Embed this notice'), 'Embed this notice');
+        $url = common_local_url('embed', array('id' => $item->notice->id));
+        // TODO: TRANS
+        $item->out->element('a', array('href' =>  $url, 'class' => 'embed', 'title' => 'Embed this notice'), 'Embed this notice');
 
         return true;
+    }
+
+    /**
+     * Map URLs to actions
+     *
+     * @param Net_URL_Mapper $m path-to-action mapper
+     *
+     * @return boolean hook value; true means continue processing, false means stop.
+     */
+    function onRouterInitialized($m)
+    {
+        $m->connect('embed/:id',
+            array('action' => 'embed'),
+            array('id' => '[0-9]+'));
+
+        return true;
+    }
+
+    /**
+     * Load related modules when needed
+     *
+     * Most non-trivial plugins will require extra modules to do their work. Typically
+     * these include data classes, action classes, widget classes, or external libraries.
+     *
+     * This method receives a class name and loads the PHP file related to that class. By
+     * tradition, action classes typically have files named for the action, all lower-case.
+     * Data classes are in files with the data class name, initial letter capitalized.
+     *
+     * Note that this method will be called for *all* overloaded classes, not just ones
+     * in this plugin! So, make sure to return true by default to let other plugins, and
+     * the core code, get a chance.
+     *
+     * @param string $cls Name of the class to be loaded
+     *
+     * @return boolean hook value; true means continue processing, false means stop.
+     */
+    function onAutoload($cls)
+    {
+        $dir = dirname(__FILE__);
+
+        switch ($cls)
+        {
+        case 'EmbedAction':
+            include_once $dir . '/' . strtolower(mb_substr($cls, 0, -6)) . '.php';
+            return false;
+        default:
+            return true;
+        }
     }
 
     /**
@@ -61,8 +106,6 @@ class EmbedNoticePlugin extends Plugin
      */
     function onPluginVersion(&$versions)
     {
-        $url = 'http://status.net/wiki/Plugin:ShareNotice';
-
         $versions[] = array('name' => 'EmbedNotice',
             'version' => STATUSNET_VERSION,
             'author' => 'Stephane Berube',
