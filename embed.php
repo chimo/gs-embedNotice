@@ -151,7 +151,6 @@ class EmbedAction extends Action
             if($elm->length !== 0) {
                 $triangle = $dom->createElement('span');
                 $triangle->setAttribute('style', 'border: 3px solid transparent; border-left-color: #000; display: inline-block; height: 0; margin: 0 3px 2px 5px; width: 0; line-height: 8px;');
-//                $triangle->nodeValue = ' '; // Do not self-close
                 $elm->item(0)->appendChild($triangle);
             }
 
@@ -190,7 +189,7 @@ class EmbedAction extends Action
             $embed_str = htmlspecialchars($embed_str, ENT_NOQUOTES);
 
             // Remove lines containing only whitespace
-			$embed_str = preg_replace("/(^[\r\n]*|[\r\n]+)[\s\t]*[\r\n]+/", "", $embed_str);
+            $embed_str = preg_replace("/(^[\r\n]*|[\r\n]+)[\s\t]*[\r\n]+/", "", $embed_str);
 
             // Spit out code
             $this->element('h2', null, 'HTML Code');
