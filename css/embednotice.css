@@ -1,6 +1,16 @@
+#embed #ch-ta {
+  height: 300px;
+  margin-bottom: 12px; 
+  width: 99%; 
+}
+
+#ch-embed #ch-ta {
+  height: 95%;
+  width: 100%;
+}
+
 .embed {
   background: url('../images/embed.gif') no-repeat;
-/*  background: url('../images/embed.png') no-repeat;*/
   float: right;
   height: 16px;
   opacity: 0.6;

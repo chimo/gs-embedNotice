@@ -209,7 +209,7 @@ class EmbedAction extends Action
 
         // Spit out code
         $this->element('h2', null, 'HTML Code');
-        $this->elementStart('textarea', array('style' => 'margin-bottom: 12px; width: 99%; height: 300px;', 'id' => 'ch-ta'));
+        $this->elementStart('textarea', array('id' => 'ch-ta'));
         $this->raw($embed_str);
         $this->elementEnd('textarea');
 
