@@ -13,16 +13,18 @@
                         });
 
     $('#content_inner').delegate('.embed', 'click', function (e) {
-        e.preventDefault();
-        e.stopPropagation();
+        if(!e.ctrlKey && !e.shiftKey) {
+            e.preventDefault();
+            e.stopPropagation();
 
-        $dialog.load($(this).attr('href') + ' #ch-ta', function(respsonse, status, xhr) {
-            if (status === 'error') {
-                // TODO: Proper error message
-                $dialog.html('<p>Error :(</p>' + xhr.status + ' ' + xhr.statusText);
-            }
-        });
+            $dialog.load($(this).attr('href') + ' #ch-ta', function(respsonse, status, xhr) {
+                if (status === 'error') {
+                    // TODO: Proper error message
+                    $dialog.html('<p>Error :(</p>' + xhr.status + ' ' + xhr.statusText);
+                }
+            });
 
-        $dialog.dialog('open'); 
+            $dialog.dialog('open'); 
+        }
     });
 })(jQuery);
