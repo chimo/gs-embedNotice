@@ -127,6 +127,25 @@ class EmbedAction extends Action
         $dom->loadHTML($notice_str);
         $xpath = new DomXPath($dom);
 
+        // Bookmark title
+        $elm = $xpath->query('//a[contains(@class, "bookmark-title")]');
+        if($elm->length !== 0) {
+            $elm = $elm->item(0)->parentNode;
+            $elm->setAttribute('style', 'margin: 0; padding: 0;');
+        }
+
+        // Bookmark tags
+        $elm = $xpath->query('//ul[contains(@class, "bookmark-tags")]');
+        if($elm->length !== 0) {
+            $elm = $elm->item(0);
+            $elm->setAttribute('style', 'list-style-type: none; margin: 0; padding: 0;');
+            foreach($elm->childNodes as $li) {
+                if($li->nodeType === XML_ELEMENT_NODE) {
+                    $li->setAttribute('style', 'display: inline;');
+                }
+            }
+        }
+
         // Remove 'embed' link
         $elm = $xpath->query('//a[contains(@class, "embed")]');
         if($elm->length !== 0) {
@@ -164,16 +183,11 @@ class EmbedAction extends Action
 
         // Add triangle
         $elm = $xpath->query('//span[contains(@class, "author")]/a');
-        if($elm->length !== 0) {
+        $adr = $xpath->query('//span[contains(@class, "addressees")]');
+        if($elm->length !== 0 && $adr->length !== 0) {
             $triangle = $dom->createElement('span');
             $triangle->setAttribute('style', 'border: 3px solid transparent; border-left-color: #000; display: inline-block; height: 0; margin: 0 3px 2px 5px; width: 0; line-height: 8px;');
             $elm->item(0)->appendChild($triangle);
-        }
-
-        // Remove all classes (reduce chances of clashing with foreign CSS)
-        $elm = $xpath->query('//*[@class]');
-        foreach($elm as $el) {
-            $el->removeAttribute('class');
         }
 
         // Avatar styles
@@ -188,10 +202,16 @@ class EmbedAction extends Action
             $elm->item(0)->setAttribute('style', 'margin: 2px 7px 0 59px;');
         }
 
-        // entry-content styles
+        // entry-content styles (NOTE: Sometimes, there's more than one of these. ex: bookmarks)
         $elm = $xpath->query('//div[contains(@class, "entry-content")]');
-        if($elm->length !== 0) {
-            $elm->item(0)->setAttribute('style', 'margin: 2px 7px 0 59px;');
+        foreach($elm as $el) {
+            $el->setAttribute('style', 'margin: 2px 7px 0 59px;');
+        }
+
+        // Remove all classes (reduce chances of clashing with foreign CSS)
+        $elm = $xpath->query('//*[@class]');
+        foreach($elm as $el) {
+            $el->removeAttribute('class');
         }
 
         // Nodes to string
