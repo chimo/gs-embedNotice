@@ -27,7 +27,7 @@ if (!defined('STATUSNET')) { exit(1); }
 class EmbedNoticePlugin extends Plugin
 {
 
-    function onEndShowStatusNetStyles($action) {
+    function onEndShowStyles($action) {
         $action->cssLink($this->path('css/embednotice.css'));
         return true;
     }

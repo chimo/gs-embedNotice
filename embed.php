@@ -48,12 +48,13 @@ class EmbedAction extends Action
     function prepare($args)
     {
         parent::prepare($args);
-        $this->notice = Notice::staticGet('id', $this->trimmed('id'));
+
+        $this->notice = Notice::getKV('id', $this->trimmed('id'));
 
         // From: /actions/shownotice.php
         if (empty($this->notice)) {
             // Did we used to have it, and it got deleted?
-            $deleted = Deleted_notice::staticGet($this->trimmed('id'));
+            $deleted = Deleted_notice::getKV($id);
             if (!empty($deleted)) {
                 // TRANS: Client error displayed trying to show a deleted notice.
                 $this->clientError(_('Notice deleted.'), 410);
@@ -61,7 +62,6 @@ class EmbedAction extends Action
                 // TRANS: Client error displayed trying to show a non-existing notice.
                 $this->clientError(_('No such notice.'), 404);
             }
-
             return false;
         }
 
