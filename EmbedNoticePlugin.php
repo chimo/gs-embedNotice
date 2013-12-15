@@ -26,6 +26,7 @@ if (!defined('STATUSNET')) { exit(1); }
 
 class EmbedNoticePlugin extends Plugin
 {
+    const VERSION = '0.1';
 
     function onEndShowStyles($action) {
         $action->cssLink($this->path('css/embednotice.css'));
@@ -107,7 +108,7 @@ class EmbedNoticePlugin extends Plugin
     function onPluginVersion(&$versions)
     {
         $versions[] = array('name' => 'EmbedNotice',
-            'version' => STATUSNET_VERSION,
+            'version' => self::VERSION,
             'author' => 'Stephane Berube',
             'homepage' => 'http://github.com/chimo/EmbedNotice',
             'rawdescription' =>
