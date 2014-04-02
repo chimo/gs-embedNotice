@@ -124,7 +124,10 @@ class EmbedAction extends Action
         // Build DOM
         $dom = new DOMDocument();
         $notice_str = mb_convert_encoding($notice_str, 'HTML-ENTITIES', 'UTF-8');
+        $libxml_previous_state = libxml_use_internal_errors(true); // suppress errors -- invalid HTML should be fixed at the source
         $dom->loadHTML($notice_str);
+        libxml_clear_errors(); // clear collected errors
+        libxml_use_internal_errors($libxml_previous_state); // we were never here
         $xpath = new DomXPath($dom);
 
         // Bookmark title
