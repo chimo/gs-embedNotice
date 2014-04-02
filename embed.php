@@ -217,6 +217,14 @@ class EmbedAction extends Action
             $el->removeAttribute('class');
         }
 
+        // Remove "id" attributes
+        $elm = $xpath->query('//*[@id]');
+        if($elm->length !== 0) {
+            foreach($elm as $curr) {
+                $curr->removeAttribute('id');
+            }
+        }
+
         // Nodes to string
         $embed_str = '<blockquote style="position: relative;">';
         $elm = $xpath->query('//body/li');
