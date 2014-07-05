@@ -117,7 +117,7 @@ class EmbedAction extends Action
 
         // Get HTML
         $out = new htmlstr();
-        $nli = new SingleNoticeItem($this->notice, $out);
+        $nli = new NoticeListItem($this->notice, $out);
         $nli->show();
         $notice_str = $out->xw->outputMemory();
 
