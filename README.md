@@ -1,7 +1,7 @@
-EmbedNotice
+gs-embedNotice
 ===========
 
-StatusNet plugin that adds an icon to each notice.  
+GNU social plugin that adds an icon to each notice.  
 Clicking the icon allows visitors to get the necessary HTML to embed a notice on a webpage.
 
 ## Screenshots
