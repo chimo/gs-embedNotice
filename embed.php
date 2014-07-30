@@ -149,6 +149,13 @@ class EmbedAction extends Action
             }
         }
 
+        // Remove p-name
+        $elm = $xpath->query('//a[contains(@class, "p-name")]');
+        if($elm->length !== 0) {
+            $elm = $elm->item(0);
+            $elm->parentNode->removeChild($elm);
+        }
+
         // Remove 'embed' link
         $elm = $xpath->query('//a[contains(@class, "embed")]');
         if($elm->length !== 0) {
@@ -164,7 +171,7 @@ class EmbedAction extends Action
         }
 
         // Add parentheses around "in context"
-        $elm = $xpath->query('//a[contains(@class, "response")]');
+        $elm = $xpath->query('//a[contains(@class, "conversation")]');
         if($elm->length !== 0) {
             $elm = $elm->item(0);
             $elm->nodeValue = '(' . $elm->nodeValue . ')';
@@ -177,7 +184,7 @@ class EmbedAction extends Action
         }
 
         // Make timestamp absolute
-        $elm = $xpath->query('//abbr[contains(@class, "published")]');
+        $elm = $xpath->query('//abbr[contains(@class, "dt-published")]');
         if($elm->length !== 0) {
             $elm = $elm->item(0);
             $date_str = explode('T', $elm->getAttribute('title'));
@@ -185,8 +192,8 @@ class EmbedAction extends Action
         }
 
         // Add triangle
-        $elm = $xpath->query('//span[contains(@class, "author")]/a');
-        $adr = $xpath->query('//span[contains(@class, "addressees")]');
+        $elm = $xpath->query('//a[contains(@class, "p-author")]/a');
+        $adr = $xpath->query('//a[contains(@class, "addressees")]');
         if($elm->length !== 0 && $adr->length !== 0) {
             $triangle = $dom->createElement('span');
             $triangle->setAttribute('style', 'border: 3px solid transparent; border-left-color: #000; display: inline-block; height: 0; margin: 0 3px 2px 5px; width: 0; line-height: 8px;');
@@ -196,7 +203,7 @@ class EmbedAction extends Action
         // Avatar styles
         $elm = $xpath->query('//img[contains(@class, "avatar")]');
         if($elm->length !== 0) {
-            $elm->item(0)->setAttribute('style', 'position: absolute; left: 5px; top: 7px;');
+            $elm->item(0)->setAttribute('style', 'position: absolute; left: 0; top: 0;');
         }
 
         // entry-title styles
@@ -206,9 +213,9 @@ class EmbedAction extends Action
         }
 
         // entry-content styles (NOTE: Sometimes, there's more than one of these. ex: bookmarks)
-        $elm = $xpath->query('//div[contains(@class, "entry-content")]');
+        $elm = $xpath->query('//div[contains(@class, "e-content")]');
         foreach($elm as $el) {
-            $el->setAttribute('style', 'margin: 2px 7px 0 59px;');
+            $el->setAttribute('style', 'margin: 2px 7px 0 0;');
         }
 
         // Remove all classes (reduce chances of clashing with foreign CSS)
@@ -226,8 +233,8 @@ class EmbedAction extends Action
         }
 
         // Nodes to string
-        $embed_str = '<blockquote style="position: relative;">';
-        $elm = $xpath->query('//body/li');
+        $embed_str = '<blockquote style="position: relative; padding-left: 55px;">';
+        $elm = $xpath->query('//li');
         $elm = $elm->item(0)->childNodes;
         foreach($elm as $el) {
             $embed_str .= $dom->saveHTML($el);
