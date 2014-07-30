@@ -114,12 +114,12 @@ class EmbedAction extends Action
         // TODO: TRANS
         // TODO: Some of these xpath queries can probably be combined
         // TODO: Better CSS support for different notice types (bookmarks, etc)
-
         // Get HTML
-        $out = new htmlstr();
-        $nli = new NoticeListItem($this->notice, $out);
+        $act = new Action('php://memory');
+        $nli = new NoticeListItem($this->notice, $act);
+        $nli->getOut()->xw->openMemory();
         $nli->show();
-        $notice_str = $out->xw->outputMemory();
+        $notice_str = $nli->getOut()->xw->outputMemory();
 
         // Build DOM
         $dom = new DOMDocument();
