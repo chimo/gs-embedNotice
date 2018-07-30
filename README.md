@@ -6,17 +6,18 @@ Clicking the icon allows visitors to get the necessary HTML to embed a notice on
 
 ## Screenshots
 
-The extra icons on the timeline:
-![Timeline icons](http://chimo.github.com/EmbedNotice/timeline.png)
+The extra icons on the timeline:  
+![Timeline icons](https://static.chromic.org/repos/gs-embedNotice/embed-notice-button.png)
 
 ----
 
-The dialog with the HTML code to copy/paste:
-![Generated HTML](http://chimo.github.com/EmbedNotice/dialog.png)
+The dialog with the HTML code to copy/paste:  
+![Generated HTML](https://static.chromic.org/repos/gs-embedNotice/embed-notice-html.png)
 
 ## Installation
 
-Make sure the files are in a folder called `EmbedNotice` if they're not already  
-Put the folder in your `/plugins/` directory  
-Tell `/config.php` to use it with: `addPlugin('EmbedNotice');`  
+1. Navigate to your /local/plugins directory (create it if it doesn't exist)
+2. `git clone https://github.com/chimo/gs-embedNotice.git EmbedNotice`
+3. Tell `/config.php` to use it with: `addPlugin('EmbedNotice');`  
+
 The embed icon should appear in each notice.
