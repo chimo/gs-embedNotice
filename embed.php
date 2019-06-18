@@ -3,7 +3,7 @@
  * PHP version 5
  *
  * @category Plugin
- * @package  StatusNet
+ * @package  GNUsocial
  * @author   Stéphane Bérubé <chimo@chromic.org>
  * @license  http://www.fsf.org/licensing/licenses/agpl.html AGPLv3
  * @link     http://github.com/chimo/EmbedNotice
@@ -22,11 +22,9 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-if (!defined('STATUSNET')) {
-    exit(1);
-}
+defined('GNUSOCIAL') || die();
 
-require_once INSTALLDIR.'/actions/shownotice.php';
+require_once INSTALLDIR . '/actions/shownotice.php';
 
 class EmbedAction extends Action
 {
@@ -45,7 +43,7 @@ class EmbedAction extends Action
      *
      * @return boolean success flag
      */
-    function prepare($args)
+    function prepare(array $args)
     {
         parent::prepare($args);
 
@@ -76,11 +74,9 @@ class EmbedAction extends Action
      * by the time handle() is called the action should be
      * more or less ready to go.
      *
-     * @param array $args $_REQUEST args; handled in prepare()
-     *
      * @return void
      */
-    function handle($args)
+    function handle()
     {
         $this->showPage();
     }
@@ -100,7 +96,7 @@ class EmbedAction extends Action
     /**
      * Show content in the content area
      *
-     * The default StatusNet page has a lot of decorations: menus,
+     * The default GNU social page has a lot of decorations: menus,
      * logos, tabs, all that jazz. This method is used to show
      * content in the content area of the page; it's the main
      * thing you want to overload.
@@ -262,7 +258,7 @@ class EmbedAction extends Action
      * Return true if read only.
      *
      * Some actions only read from the database; others read and write.
-     * The simple database load-balancer built into StatusNet will
+     * The simple database load-balancer built into GNU social will
      * direct read-only actions to database mirrors (if they are configured),
      * and read-write actions to the master database.
      *
